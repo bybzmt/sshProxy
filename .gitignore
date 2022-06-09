@@ -1,0 +1,13 @@
+!.empty
+/sshProxy
+/shadowsocks.db
+
+#vim temp file
+*.swp
+*~
+*.swo
+
+/webUI/package-lock.json
+/webUI/node_modules
+
+/ui/dist
