@@ -16,14 +16,14 @@ import (
 var debug ss.DebugLog
 
 type flg struct {
-	addr, cipher, passwd string
-	c_addr, host         string
-	db                   string
-	def                  bool
-	rules                []string
-	timeout              int
-	LDNS                 []string
-	RDNS                 []string
+	addr, cipher string
+	user, passwd string
+	c_addr, host string
+	db           string
+	rules        []string
+	timeout      int
+	LDNS         []string
+	RDNS         []string
 }
 
 func main() {
@@ -45,15 +45,16 @@ func main() {
 
 	server.String(&f.addr, "a", "addr", "shadowsocks listen on addr:port. default :1080")
 	server.String(&f.cipher, "c", "cipher", "cipher: "+strings.Join(ss.AllCiphers(), " "))
+	server.String(&f.user, "u", "user", "user")
 	server.String(&f.passwd, "p", "passwd", "password")
 	server.Int(&f.timeout, "t", "timeout", "timeout in seconds. default 65s")
 
 	client.String(&f.c_addr, "a", "addr", "socks5 listen on addr:port. default :1080")
 	client.String(&f.addr, "s", "server", "server addr:port")
 	client.String(&f.cipher, "c", "cipher", "server cipher: "+strings.Join(ss.AllCiphers(), " "))
+	client.String(&f.user, "u", "user", "server user")
 	client.String(&f.passwd, "p", "passwd", "server password")
 	client.Int(&f.timeout, "t", "timeout", "timeout in seconds. default 65s")
-	client.Bool(&f.def, "", "default", "default action proxy or direct")
 	client.StringSlice(&f.rules, "", "rule", "pac rule file")
 	client.StringSlice(&f.LDNS, "", "LDNS", "local direct dns")
 	client.StringSlice(&f.RDNS, "", "RDNS", "remote proxy dns")
@@ -97,7 +98,7 @@ func main() {
 }
 
 func runServer(f flg) {
-	server, err := ss.NewServer(f.addr, f.cipher, f.passwd, f.timeout)
+	server, err := ss.NewServer(f.addr, f.cipher, f.user, f.passwd, f.timeout)
 	if err != nil {
 		log.Println("NewServer Error:", err)
 		os.Exit(1)
@@ -115,10 +116,9 @@ func runServer(f flg) {
 func runClient(f flg) {
 
 	client := ss.NewClient(f.c_addr, 3, f.timeout)
-	client.Proxy = f.def
 
 	if f.addr != "" {
-		err := client.AddServer(f.addr, f.cipher, f.passwd)
+		err := client.AddServer(0, f.addr, f.cipher, f.user, f.passwd)
 		if err != nil {
 			log.Println("Server Error", err)
 			os.Exit(1)
@@ -131,7 +131,7 @@ func runClient(f flg) {
 			log.Println("Load Rule", err)
 			os.Exit(1)
 		}
-		client.AddRules(ts)
+		client.AddRules(ts, "")
 	}
 	for _, t := range f.LDNS {
 		client.SetLocalDNS(t)

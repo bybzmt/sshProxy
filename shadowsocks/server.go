@@ -15,10 +15,10 @@ type Server struct {
 	timeout     time.Duration
 }
 
-func NewServer(addr, cipher, passwd string, timeout int) (*Server, error) {
+func NewServer(addr, cipher, user, passwd string, timeout int) (*Server, error) {
 	c := &Server{}
 
-	t, err := NewShadow("tcp", addr, cipher, passwd)
+	t, err := NewShadow("tcp", addr, cipher, user, passwd)
 	if err != nil {
 		return nil, err
 	}
@@ -40,11 +40,11 @@ func (s *Server) ListenAndServe() error {
 	for {
 		c, e := l.Accept()
 		if e != nil {
+			Debug.Println("Accept", e)
 			continue
 		}
 		go s.Serve(c)
 	}
-	return nil
 }
 
 func (s *Server) Serve(c net.Conn) {
@@ -52,7 +52,7 @@ func (s *Server) Serve(c net.Conn) {
 
 	c.SetReadDeadline(time.Now().Add(s.timeout))
 
-	from := s.shadow.Shadow(s.trafficConn(c))
+	from := s.trafficConn(s.shadow.Shadow(c))
 
 	addr, err := ReadRawAddr(from)
 	if err != nil {

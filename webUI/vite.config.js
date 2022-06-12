@@ -4,9 +4,7 @@ import postcssImport from 'postcss-import';
 import tailwindcss from 'tailwindcss';
 import postcssNested from 'postcss-nested';
 import autoprefixer from 'autoprefixer';
-import cssnano from 'cssnano';
 import path from 'path';
-import postcss_url from "postcss-url";
 
 //import { fileURLToPath } from 'url';
 //const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -16,17 +14,7 @@ let dir_src = path.resolve(__dirname, './src');
 export default defineConfig(({command, mode}) =>{
     console.log("command", command, "mode", mode)
 
-    let api_base;
-    let use_cssnano = false;
-
-    if (mode === 'production') {
-        api_base = JSON.stringify("http://api.test")
-        use_cssnano = true;
-    } else if (mode === 'test') {
-        api_base = JSON.stringify("http://api.test")
-    } else {
-        api_base = JSON.stringify("http://api.lan")
-    }
+    let api_base = JSON.stringify("http://shadowsocks");
 
     let postcss_config = {
         plugins: [
@@ -41,14 +29,6 @@ export default defineConfig(({command, mode}) =>{
                 cascade: true,
             }),
         ],
-    }
-
-    if (use_cssnano) {
-        postcss_config.plugins.push(
-            cssnano({
-                preset: 'default',
-            })
-        );
     }
 
     return {

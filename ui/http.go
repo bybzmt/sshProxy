@@ -2,7 +2,10 @@ package ui
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"regexp"
+	"regexp/syntax"
 	ss "sshProxy/shadowsocks"
 	"strconv"
 	"sync/atomic"
@@ -15,6 +18,39 @@ type ui_state struct {
 	ConnNum  int32
 	Incoming string
 	Outgoing string
+}
+
+func (this *ui) cross(fn http.HandlerFunc) http.HandlerFunc {
+
+	reg, err := syntax.Parse("^(http|https)://(127.0.0.1|localhost)(:\\d+)?", syntax.Perl)
+	if err != nil {
+		log.Panicln(err)
+	}
+	perl, err := regexp.Compile(reg.String())
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		if origin != "" {
+			if !perl.MatchString(origin) {
+				w.WriteHeader(403)
+				return
+			}
+
+			//w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(204)
+				return
+			}
+		}
+
+		fn(w, r)
+	}
+
 }
 
 //读取状态
@@ -87,9 +123,9 @@ func (this *ui) apiRuleAdd(w http.ResponseWriter, r *http.Request) {
 	var rs Rules
 
 	rs.Note = r.FormValue("Note")
-	rs.Proxy = r.FormValue("Proxy") == "1"
 	rs.Enable = r.FormValue("Enable") == "1"
 	rs.Items = r.FormValue("Items")
+	rs.Servers = r.FormValue("Servers")
 
 	err := this.store.Insert(bolthold.NextSequence(), &rs)
 	if err != nil {
@@ -107,9 +143,9 @@ func (this *ui) apiRuleEdit(w http.ResponseWriter, r *http.Request) {
 
 	rs.ID = uint64(id)
 	rs.Note = r.FormValue("Note")
-	rs.Proxy = r.FormValue("Proxy") == "1"
 	rs.Enable = r.FormValue("Enable") == "1"
 	rs.Items = r.FormValue("Items")
+	rs.Servers = r.FormValue("Servers")
 
 	err := this.store.Update(rs.ID, rs)
 	if err != nil {
@@ -153,9 +189,10 @@ func (this *ui) apiClientConfigSave(w http.ResponseWriter, r *http.Request) {
 	rs.Addr = r.FormValue("Addr")
 	rs.Timeout, _ = strconv.Atoi(r.FormValue("Timeout"))
 	rs.IdleTimeout, _ = strconv.Atoi(r.FormValue("IdleTimeout"))
-	rs.Proxy = r.FormValue("Proxy") == "1"
 	rs.LDNS = r.FormValue("LDNS")
+	rs.LDNSEnable = r.FormValue("LDNSEnable") == "1"
 	rs.RDNS = r.FormValue("RDNS")
+	rs.RDNSEnable = r.FormValue("RDNSEnable") == "1"
 
 	err := this.store.Upsert("ClientConfig", &rs)
 	if err != nil {

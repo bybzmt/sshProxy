@@ -8,9 +8,10 @@ import (
 )
 
 type Rules struct {
-	Host pac.Domain
-	IP   pac.IPNets
-	Regs []regexp.Regexp
+	Host     pac.Domain
+	IP       pac.IPNets
+	Regs     []regexp.Regexp
+	ServerID []uint64
 }
 
 func (r *Rules) Init() {

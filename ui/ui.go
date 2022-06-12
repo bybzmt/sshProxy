@@ -61,19 +61,19 @@ func (this *ui) init() {
 
 	this.handler.Handle("/", http.FileServer(http.FS(tfs)))
 
-	this.handler.HandleFunc("/api/state", this.apiState)
-	this.handler.HandleFunc("/api/log", this.apiLog)
-	this.handler.HandleFunc("/api/rules", this.apiRules)
-	this.handler.HandleFunc("/api/ruleAdd", this.apiRuleAdd)
-	this.handler.HandleFunc("/api/ruleEdit", this.apiRuleEdit)
-	this.handler.HandleFunc("/api/ruleDel", this.apiRuleDel)
-	this.handler.HandleFunc("/api/clientConfig", this.apiClientConfig)
-	this.handler.HandleFunc("/api/clientConfigSave", this.apiClientConfigSave)
-	this.handler.HandleFunc("/api/serverConfigs", this.apiServerConfigs)
-	this.handler.HandleFunc("/api/serverConfigAdd", this.apiServerConfigAdd)
-	this.handler.HandleFunc("/api/serverConfigEdit", this.apiServerConfigEdit)
-	this.handler.HandleFunc("/api/serverConfigDel", this.apiServerConfigDel)
-	this.handler.HandleFunc("/api/restart", this.apiRestart)
+	this.handler.HandleFunc("/api/state", this.cross(this.apiState))
+	this.handler.HandleFunc("/api/log", this.cross(this.apiLog))
+	this.handler.HandleFunc("/api/rules", this.cross(this.apiRules))
+	this.handler.HandleFunc("/api/ruleAdd", this.cross(this.apiRuleAdd))
+	this.handler.HandleFunc("/api/ruleEdit", this.cross(this.apiRuleEdit))
+	this.handler.HandleFunc("/api/ruleDel", this.cross(this.apiRuleDel))
+	this.handler.HandleFunc("/api/clientConfig", this.cross(this.apiClientConfig))
+	this.handler.HandleFunc("/api/clientConfigSave", this.cross(this.apiClientConfigSave))
+	this.handler.HandleFunc("/api/serverConfigs", this.cross(this.apiServerConfigs))
+	this.handler.HandleFunc("/api/serverConfigAdd", this.cross(this.apiServerConfigAdd))
+	this.handler.HandleFunc("/api/serverConfigEdit", this.cross(this.apiServerConfigEdit))
+	this.handler.HandleFunc("/api/serverConfigDel", this.cross(this.apiServerConfigDel))
+	this.handler.HandleFunc("/api/restart", this.cross(this.apiRestart))
 }
 
 func (this *ui) Run() error {
@@ -111,10 +111,10 @@ func (this *ui) initClient() {
 		ss.Debug.Println("initClientConfig", err)
 	}
 	if rs.Addr == "" {
-		rs.Addr = ":1080"
+		rs.Addr = "127.0.0.1:1080"
 	}
 	if rs.Timeout < 1 {
-		rs.Timeout = 5
+		rs.Timeout = 10
 	}
 	if rs.IdleTimeout < 5 {
 		rs.IdleTimeout = 120
@@ -129,11 +129,10 @@ func (this *ui) initClient() {
 	log.Println("open http://" + this.watcher.host)
 
 	this.ssServer = ss.NewClient(rs.Addr, rs.Timeout, rs.IdleTimeout)
-	this.ssServer.Proxy = rs.Proxy
-	if rs.LDNS != "" {
+	if rs.LDNSEnable && rs.LDNS != "" {
 		this.ssServer.SetLocalDNS(rs.LDNS)
 	}
-	if rs.RDNS != "" {
+	if rs.RDNSEnable && rs.RDNS != "" {
 		this.ssServer.SetRemoteDNS(rs.RDNS)
 	}
 	this.ssServer.Watcher = &this.watcher
@@ -148,7 +147,7 @@ func (this *ui) initServer() {
 	}
 
 	for _, r := range rs {
-		this.ssServer.AddServer(r.Addr, r.Cipher, r.Passwd)
+		this.ssServer.AddServer(r.ID, r.Addr, r.Cipher, r.User, r.Passwd)
 	}
 }
 
@@ -156,13 +155,13 @@ func (this *ui) initRules() {
 	var rs []Rules
 
 	err := this.store.Find(&rs,
-		bolthold.Where("Enable").Eq(true).And("Proxy").Eq(!this.ssServer.Proxy))
+		bolthold.Where("Enable").Eq(true))
 	if err != nil {
 		ss.Debug.Println("initRules", err)
 	}
 
 	for _, r := range rs {
-		this.ssServer.AddRules(r.Items)
+		this.ssServer.AddRules(r.Items, r.Servers)
 	}
 }
 

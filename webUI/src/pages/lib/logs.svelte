@@ -1,24 +1,14 @@
-<script context="module">
-    export const load = async () => {
-        console.log("load1");
-
-        return {
-            props: {
-                a: Math.random(),
-            },
-        };
-    };
-</script>
 
 <script>
     import { onMount, onDestroy } from 'svelte';
 
-    export let logs = [];
     export let type = 0;
     export let length = 100;
 
+    let logs = [];
+
     function load() {
-        let url = "/api/log?type=" + type + "&length=" + length;
+        let url = API_BASE + "/api/log?type=" + type + "&length=" + length;
 
         fetch(url)
             .then((t) => t.json())
@@ -28,13 +18,15 @@
     }
 
     let timer;
-    onMount(() => {
-        timer = setInterval(load, 500);
-    }
 
-    onDestroy(()=>{
+    onMount(() => {
+        load()
+        timer = setInterval(load, 500);
+    });
+
+   onDestroy(()=>{
         clearInterval(timer);
-    })
+    });
 </script>
 
 <table>

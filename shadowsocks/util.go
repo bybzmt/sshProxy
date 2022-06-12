@@ -32,12 +32,17 @@ func Relay(a, b net.Conn) (err error) {
 }
 
 func StrSplit(str string) (out []string) {
-	for _, tm := range strings.Split(str, "\n") {
-		for _, t := range strings.Split(tm, "\r") {
-			t = strings.TrimSpace(t)
-			if len(t) > 0 {
-				if t[0] != '#' {
-					out = append(out, t)
+	for _, t1 := range strings.Split(str, "\n") {
+		for _, t2 := range strings.Split(t1, "\r") {
+			t2 = strings.TrimSpace(t2)
+			if len(t2) > 0 {
+				if t2[0] != '#' {
+					for _, t3 := range strings.Split(t2, ",") {
+						t3 = strings.TrimSpace(t3)
+						if len(t3) > 0 {
+							out = append(out, t3)
+						}
+					}
 				}
 			}
 		}

@@ -1,8 +1,11 @@
 
+<script>
+  import "./tailwind.css";
+</script>
+
 <div>
     <nav>
         <a href="#/" >State</a>
-        <a href="#/logs" >Logs</a>
         <a href="#/config" >Client</a>
         <a href="#/server" >Server</a>
         <a href="#/rules" >Rules</a>
@@ -12,10 +15,13 @@
 </div>
 
 <style>
-.nav {
-    margin:10px;
+nav {
+    margin: 1em 0;
 }
-.nav a{
-    margin:10px;
+nav a{
+    margin: 0 1em 0 0;
+}
+div{
+    margin: 1em;
 }
 </style>

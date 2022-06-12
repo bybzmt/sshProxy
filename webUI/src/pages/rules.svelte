@@ -1,110 +1,120 @@
-<script context="module">
-    export const load = async () => {
-        console.log("load1");
-        return {
-            props: {
-                a: Math.random(),
-            },
-        };
-    };
-</script>
-
 <script>
-    let Rules = [];
-    let Edit = null;
+  import Layout from "./lib/layout.svelte";
+  import { onMount } from "svelte";
 
-    function refresh() {
-    fetch("/api/rules").then(t=>t.json()).then(data=>{
-        Rules = data
-    });
+  let Rules = [];
+  let Edit = {
+    Note: "",
+    Enable: true,
+    Items: "",
+  };
+
+  function refresh() {
+    fetch(API_BASE + "/api/rules")
+      .then((t) => t.json())
+      .then((data) => {
+        Rules = data;
+      });
   }
 
-  function set(ele) {
-  }
-
-  function del(id) {
+  function del(data) {
     var formData = new FormData();
-    formData.append("ID", id)
+    formData.append("ID", data.ID);
 
-    fetch("/api/ruleDel",{
-      method: 'POST',
+    fetch(API_BASE + "/api/ruleDel", {
+      method: "POST",
       body: formData,
-    }).then(t=>t.text()).then(d=>{
-      this.refresh()
-    });
+    })
+      .then((t) => t.text())
+      .then((d) => {
+        refresh();
+      });
   }
 
-  function doSave() {
+  function doSave(data) {
     var formData = new FormData();
-    formData.append("Items", Edit.Items)
-    formData.append("Note", Edit.Note)
-    formData.append("Proxy", Edit.Proxy ? "1":"")
-    formData.append("Enable", Edit.Enable ? "1":"")
+    formData.append("Items", data.Items);
+    formData.append("Note", data.Note);
+    formData.append("Enable", data.Enable ? "1" : "");
+    formData.append("ID", Edit.ID);
 
-    let url
+    let url;
 
-    if (edit == null) {
-      url = "/api/ruleAdd";
-    } else {
+    if (data.ID) {
       url = "/api/ruleEdit";
-      formData.append("ID", this.state.edit.ID)
+    } else {
+      url = "/api/ruleAdd";
     }
 
-    fetch(url,{
-      method: 'POST',
+    fetch(API_BASE + url, {
+      method: "POST",
       body: formData,
-    }).then(t=>t.text()).then(d=>{
-      this.refresh()
-    });
+    })
+      .then((t) => t.text())
+      .then((d) => {
+        refresh();
+      });
   }
+
+  onMount(() => {
+    refresh();
+  });
 </script>
 
-<svelte:head>
-    <title>index</title>
-</svelte:head>
+<Layout>
+  <table>
+    <tr>
+      <td>ID</td>
+      <td>Note</td>
+      <td>Roules</td>
+      <td>Servers</td>
+      <td>Enable</td>
+      <td />
+    </tr>
 
-<div>
-      <div className={styles.rulesNav}>
-      {Rules.map(r=>(r.ID===this.state.edit.ID) ?
-        <span><b>{r.Note}</b></span>
-       :
-        <span onclick={()=>set(r)}>{r.Note}</span>
-      )}
-      &nbsp;
-    <span onclick={()=>set()}>Add</span>
-      </div>
-      <div>
-      <div className={styles.tr}>
-      <span className={styles.td}>Note</span>
-      <input value={edit.Note} onchange={c1} />
-      </div>
-      <div className={styles.tr}>
-      <span className={styles.td}>Action:</span>
-        <label>
-        <input type="radio" name="proxy" checked={edit.Proxy} onchange={c2} /> Proxy
-        </label>
-        <label>
-        <input type="radio" name="proxy" checked={!edit.Proxy} onchange={c2} /> Direct
-        </label>
-      </div>
-      <div className={styles.tr}>
-      <span className={styles.td}>Enable</span>
-      <input type="checkbox" checked={edit.Enable} onchange={c3} />
-      </div>
-      <div>
-      <textarea className={styles.td} value={edit.Items} onchange={c4} />
-      </div>
-      <div>
-      <input type="button" value="Save" onclick={()=>this.doSave()} /> &nbsp;
-    {edit.ID !== "" &&
-        <input type="button" value="Del" onclick={()=>this.del(edit.ID)} />
-    }
-      </div>
-      </div>
-      </div>
+    {#each Rules as rule}
+      <tr>
+        <td>{rule.ID}</td>
+        <td><input class="border w-full" bind:value={rule.Note} /></td>
+        <td>
+          <textarea class="border w-full" bind:value={rule.Items} />
+        </td>
+        <td><input class="border w-full" bind:value={rule.Servers} /></td>
+        <td>
+          <input type="checkbox" bind:value={rule.Enable} />
+        </td>
+        <td>
+          <button class="border" type="button" on:click={() => doSave(rule)}
+            >Save</button
+          >
+          <button class="border" type="button" on:click={() => del(rule)}
+            >Del</button
+          >
+        </td>
+      </tr>
+    {/each}
+
+    <tr>
+      <td>--</td>
+      <td><input class="border w-full" bind:value={Edit.Note} /></td>
+      <td>
+        <textarea class="border w-full" bind:value={Edit.Items} />
+      </td>
+      <td><input class="border w-full" bind:value={Edit.Servers} /></td>
+      <td>
+        <input type="checkbox" bind:value={Edit.Enable} />
+      </td>
+      <td>
+        <button class="border" type="button" on:click={() => doSave(Edit)}
+          >Add</button
+        >
+      </td>
+    </tr>
+  </table>
+</Layout>
 
 <style>
-    main {
-        color: red;
-    }
+  td {
+    vertical-align: top;
+  }
 </style>
