@@ -125,7 +125,7 @@ func (this *ui) initClient() {
 		rs.Addr = this.cliAddr
 	}
 
-	log.Println("Starting Shadowsocks Client At", rs.Addr)
+	log.Println("Starting Client At", rs.Addr)
 	log.Println("open http://" + this.watcher.host)
 
 	this.ssServer = ss.NewClient(rs.Addr, rs.Timeout, rs.IdleTimeout)

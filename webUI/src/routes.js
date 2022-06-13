@@ -4,6 +4,9 @@ export default {
         "/": {
             page: () => import('./pages/index.svelte'),
         },
+        "/state": {
+            page: () => import('./pages/state.svelte'),
+        },
         "/config": {
             page: () => import('./pages/config.svelte'),
         },

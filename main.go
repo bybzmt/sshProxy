@@ -60,7 +60,7 @@ func main() {
 	client.StringSlice(&f.RDNS, "", "RDNS", "remote proxy dns")
 
 	ui.String(&f.addr, "a", "addr", "shadowsocks listen on addr:port")
-	ui.String(&f.db, "", "db", "database file. default: ./shadowsocks.db")
+	ui.String(&f.db, "", "db", "database file. default: ./sshProxy.db")
 	ui.String(&f.host, "", "host", "web ui host default: shadowsocks")
 
 	flaggy.AttachSubcommand(client, 1)
@@ -82,7 +82,7 @@ func main() {
 		f.c_addr = ":1080"
 	}
 	if f.db == "" {
-		f.db = "shadowsocks.db"
+		f.db = "sshProxy.db"
 	}
 	if f.host == "" {
 		f.host = "shadowsocks"
@@ -104,7 +104,7 @@ func runServer(f flg) {
 		os.Exit(1)
 	}
 
-	log.Println("Starting Shadowsocks Server At", f.addr)
+	log.Println("Starting Proxy Server At", f.addr)
 
 	err = server.ListenAndServe()
 	if err != nil {
@@ -140,7 +140,7 @@ func runClient(f flg) {
 		client.SetRemoteDNS(t)
 	}
 
-	log.Println("Starting Shadowsocks Client At", f.c_addr)
+	log.Println("Starting Client At", f.c_addr)
 
 	go cliState(client)
 
@@ -166,7 +166,7 @@ func cliState(c *ss.Client) {
 }
 
 func runClientUI(f flg) {
-	log.Println("Starting Shadowsocks Database", f.db)
+	log.Println("Starting Database", f.db)
 
 	u := ui.NewUI(f.db, f.addr, f.host)
 
