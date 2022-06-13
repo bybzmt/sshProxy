@@ -22,7 +22,7 @@ type ui_state struct {
 
 func (this *ui) cross(fn http.HandlerFunc) http.HandlerFunc {
 
-	reg, err := syntax.Parse("^(http|https)://(127.0.0.1|localhost)(:\\d+)?", syntax.Perl)
+	reg, err := syntax.Parse("^(http|https)://(127.0.0.1|localhost|shadowsocks)(:\\d+)?", syntax.Perl)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -219,6 +219,7 @@ func (this *ui) apiServerConfigAdd(w http.ResponseWriter, r *http.Request) {
 	var rs ServerConfig
 
 	rs.Addr = r.FormValue("Addr")
+	rs.User = r.FormValue("User")
 	rs.Passwd = r.FormValue("Passwd")
 	rs.Cipher = r.FormValue("Cipher")
 	rs.Note = r.FormValue("Note")
@@ -239,6 +240,7 @@ func (this *ui) apiServerConfigEdit(w http.ResponseWriter, r *http.Request) {
 
 	rs.ID = uint64(id)
 	rs.Addr = r.FormValue("Addr")
+	rs.User = r.FormValue("User")
 	rs.Passwd = r.FormValue("Passwd")
 	rs.Cipher = r.FormValue("Cipher")
 	rs.Note = r.FormValue("Note")

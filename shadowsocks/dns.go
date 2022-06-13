@@ -2,10 +2,11 @@ package shadowsocks
 
 import (
 	"context"
-	lru "github.com/hashicorp/golang-lru"
 	"net"
 	"sync"
 	"time"
+
+	lru "github.com/hashicorp/golang-lru"
 )
 
 type dnsVal struct {
@@ -86,8 +87,6 @@ func (d *dns) _lookupIPAddr(host string) ([]net.IPAddr, error) {
 		Debug.Println("Lookup", host, err)
 		return nil, err
 	}
-
-	Debug.Println("Lookup", host, ipaddr)
 
 	v := dnsVal{
 		ipaddr: ipaddr,

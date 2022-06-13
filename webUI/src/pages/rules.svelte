@@ -5,7 +5,7 @@
   let Rules = [];
   let Edit = {
     Note: "",
-    Enable: true,
+    Enable: false,
     Items: "",
   };
 
@@ -35,8 +35,9 @@
     var formData = new FormData();
     formData.append("Items", data.Items);
     formData.append("Note", data.Note);
+    formData.append("Servers", data.Servers);
     formData.append("Enable", data.Enable ? "1" : "");
-    formData.append("ID", Edit.ID);
+    formData.append("ID", data.ID);
 
     let url;
 
@@ -81,15 +82,11 @@
         </td>
         <td><input class="border w-full" bind:value={rule.Servers} /></td>
         <td>
-          <input type="checkbox" bind:value={rule.Enable} />
+          <input type="checkbox" bind:checked={rule.Enable} />
         </td>
         <td>
-          <button class="border" type="button" on:click={() => doSave(rule)}
-            >Save</button
-          >
-          <button class="border" type="button" on:click={() => del(rule)}
-            >Del</button
-          >
+          <button class="border" type="button" on:click={() => doSave(rule)}>Save</button>
+          <button class="border" type="button" on:click={() => del(rule)}>Del</button>
         </td>
       </tr>
     {/each}
@@ -102,12 +99,10 @@
       </td>
       <td><input class="border w-full" bind:value={Edit.Servers} /></td>
       <td>
-        <input type="checkbox" bind:value={Edit.Enable} />
+        <input type="checkbox" bind:checked={Edit.Enable} />
       </td>
       <td>
-        <button class="border" type="button" on:click={() => doSave(Edit)}
-          >Add</button
-        >
+        <button class="border" type="button" on:click={() => doSave(Edit)}>Add</button>
       </td>
     </tr>
   </table>

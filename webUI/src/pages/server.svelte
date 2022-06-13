@@ -9,7 +9,7 @@
         Passwd: "",
         Cipher: "",
         Note: "",
-        Enable: true,
+        Enable: false,
     };
     let edit = editDefault;
 
@@ -29,10 +29,11 @@
         var formData = new FormData();
         formData.append("ID", data.ID);
         formData.append("Addr", data.Addr);
+        formData.append("User", data.User);
         formData.append("Passwd", data.Passwd);
         formData.append("Cipher", data.Cipher);
         formData.append("Note", data.Note);
-        formData.append("Enable", data.Enable);
+        formData.append("Enable", data.Enable ? "1" : "");
 
         let url;
         if (data.ID) {
@@ -85,42 +86,27 @@
         {#each Servers as server}
             <tr>
                 <td>{server.ID}</td>
-                <td><input class="border w-full" bind:value={server.Addr} /></td
-                >
+                <td><input class="border w-full" bind:value={server.Addr} /></td>
                 <td>
                     <Ciphers bind:value={server.Cipher} />
                 </td>
-                <td><input class="border w-full" bind:value={edit.User} /></td>
-                <td
-                    ><input
-                        class="border w-full"
-                        bind:value={server.Passwd}
-                    /></td
-                >
+                <td><input class="border w-full" bind:value={server.User} /></td>
+                <td><input class="border w-full" bind:value={server.Passwd} /></td>
 
-                <td><input class="border w-full" bind:value={server.Note} /></td
-                >
-                <td
-                    ><input
-                        class="border w-full"
-                        type="checkbox"
-                        bind:value={server.Enable}
-                    /></td
-                >
+                <td><input class="border w-full" bind:value={server.Note} /></td>
+                <td><input class="border w-full" type="checkbox" bind:checked={server.Enable} /></td>
                 <td>
                     <button
                         type="button"
                         on:click={() => {
                             save(server);
-                        }}>edit</button
-                    >
+                        }}>save</button>
                     &nbsp;
                     <button
                         type="button"
                         on:click={() => {
                             del(server);
-                        }}>del</button
-                    >
+                        }}>del</button>
                 </td>
             </tr>
         {/each}
@@ -133,21 +119,14 @@
             <td><input class="border w-full" bind:value={edit.User} /></td>
             <td><input class="border w-full" bind:value={edit.Passwd} /></td>
             <td><input class="border w-full" bind:value={edit.Note} /></td>
-            <td
-                ><input
-                    class="border w-full"
-                    type="checkbox"
-                    bind:value={edit.Enable}
-                /></td
-            >
+            <td><input class="border w-full" type="checkbox" bind:checked={edit.Enable} /></td>
             <td
                 ><button
                     type="button"
                     on:click={() => {
                         save(edit);
                     }}>add</button
-                ></td
-            >
+                ></td>
         </tr>
     </table>
 </Layout>

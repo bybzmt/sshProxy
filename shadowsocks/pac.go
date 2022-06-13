@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"regexp/syntax"
 	pac "sshProxy/shadowsocks/pac"
+	"strings"
 )
 
 type Rules struct {
@@ -36,6 +37,9 @@ func (r *Rules) Add(rule string) {
 }
 
 func (r *Rules) Match(host string) bool {
+	tmp := strings.Split(host, ":")
+	host = tmp[0]
+
 	ip := net.ParseIP(host)
 
 	if ip != nil {

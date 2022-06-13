@@ -3,13 +3,13 @@
     import { onMount } from "svelte";
 
     let data = {
-        Addr:"",
-        Timeout:0,
-        IdleTimeout:0,
-        LDNS:"",
-        LDNSEnable:false,
-        RDNS:"",
-        RDNSEnable:false,
+        Addr: "",
+        Timeout: 0,
+        IdleTimeout: 0,
+        LDNS: "",
+        LDNSEnable: false,
+        RDNS: "",
+        RDNSEnable: false,
     };
 
     function load() {
@@ -26,9 +26,9 @@
         formData.append("Timeout", data.Timeout);
         formData.append("IdleTimeout", data.IdleTimeout);
         formData.append("LDNS", data.LDNS);
-        formData.append("LDNSEable", data.LDNSEable ? "1" : "");
+        formData.append("LDNSEnable", data.LDNSEnable ? "1" : "");
         formData.append("RDNS", data.RDNS);
-        formData.append("RDNSEable", data.RDNSEable ? "1" : "");
+        formData.append("RDNSEnable", data.RDNSEnable ? "1" : "");
 
         fetch(API_BASE + "/api/clientConfigSave", {
             method: "POST",
@@ -69,22 +69,12 @@
                     <textarea class="border" bind:value={data.LDNS} />
                     <br />
                     <label>
-                        <input
-                            type="radio"
-                            name="LDNSEable"
-                            bind:group={data.LDNSEnable}
-                            value={true}
-                        />
+                        <input type="radio" name="LDNSEable" bind:group={data.LDNSEnable} value={true} />
                         Enable
                     </label>
 
                     <label>
-                        <input
-                            type="radio"
-                            name="LDNSEable"
-                            bind:group={data.LDNSEnable}
-                            value={false}
-                        />
+                        <input type="radio" name="LDNSEable" bind:group={data.LDNSEnable} value={false} />
                         Disable
                     </label>
                 </td>
@@ -97,31 +87,19 @@
                     ><textarea class="border" bind:value={data.RDNS} />
                     <br />
                     <label>
-                        <input
-                            type="radio"
-                            name="RDNSEable"
-                            bind:group={data.RDNSEnable}
-                            value={true}
-                        />
+                        <input type="radio" name="RDNSEable" bind:group={data.RDNSEnable} value={true} />
                         Enable
                     </label>
 
                     <label>
-                        <input
-                            type="radio"
-                            name="RDNSEable"
-                            bind:group={data.RDNSEnable}
-                            value={false}
-                        />
+                        <input type="radio" name="RDNSEable" bind:group={data.RDNSEnable} value={false} />
                         Disable
                     </label>
                 </td>
             </tr>
             <tr>
                 <td colspan="2" class="text-right">
-                    <button class="border" type="button" on:click={doSave}
-                        >save & restart</button
-                    >
+                    <button class="border" type="button" on:click={doSave}>save & restart</button>
                 </td>
             </tr>
         </table>

@@ -1,5 +1,6 @@
 !.empty
 /sshProxy
+/sshProxy.exe
 /shadowsocks.db
 
 #vim temp file

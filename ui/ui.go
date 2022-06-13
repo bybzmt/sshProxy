@@ -114,10 +114,10 @@ func (this *ui) initClient() {
 		rs.Addr = "127.0.0.1:1080"
 	}
 	if rs.Timeout < 1 {
-		rs.Timeout = 10
+		rs.Timeout = 5
 	}
 	if rs.IdleTimeout < 5 {
-		rs.IdleTimeout = 120
+		rs.IdleTimeout = 60
 	}
 
 	if this.cliAddr != "" && rs.Addr != this.cliAddr {
@@ -147,7 +147,10 @@ func (this *ui) initServer() {
 	}
 
 	for _, r := range rs {
-		this.ssServer.AddServer(r.ID, r.Addr, r.Cipher, r.User, r.Passwd)
+		err := this.ssServer.AddServer(r.ID, r.Addr, r.Cipher, r.User, r.Passwd)
+		if err != nil {
+			ss.Debug.Println("AddServer", err)
+		}
 	}
 }
 

@@ -185,6 +185,7 @@ func (c *Client) match(addr string) *Shadow {
 		idx := int(atomic.AddUint32(&c.idx, 1) % uint32(len(c.shadows)))
 
 		s := c.shadows[idx]
+
 		if s.Rule.Match(addr) {
 			return s
 		}
@@ -195,6 +196,8 @@ func (c *Client) match(addr string) *Shadow {
 
 func (s *Client) dial(addr RawAddr) (conn net.Conn, ac bool, err error) {
 	server := s.match(addr.String())
+
+	Debug.Println("Match", server != nil, addr.String())
 
 	if server != nil {
 		conn, err = s.dialShadow(server, addr)
