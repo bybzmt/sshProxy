@@ -161,18 +161,18 @@ func (s *Client) Serve(from net.Conn) {
 	}
 
 	from = s.trafficConn(from, &s.Traffic, nil)
-
 	to, ac, err := s.dial(addr)
-	if err != nil {
-		Debug.Println("Dial", err)
-		return
-	}
-	defer to.Close()
 
 	s.Watcher.OnProxyStart(ac, from.RemoteAddr(), addr)
 	defer func() {
 		s.Watcher.OnProxyStop(ac, from.RemoteAddr(), addr, err)
 	}()
+
+	if err != nil {
+		Debug.Println("Dial", err)
+		return
+	}
+	defer to.Close()
 
 	err = Relay(s.tickConn(from, time.Second), s.tickConn(to, 0))
 	if err != nil {

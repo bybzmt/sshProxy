@@ -227,6 +227,7 @@ func (this *ui) runStore() {
 				ss.Debug.Println("log find", err)
 			} else if len(t1) > 0 {
 				t1[0].Msg = t.Msg
+				t1[0].Proxy = t.Proxy
 				this.store.Update(t1[0].ID, t1[0])
 			} else {
 				ss.Debug.Println("Not Found Log", t.From, t.To)
